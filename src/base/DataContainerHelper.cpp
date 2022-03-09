@@ -122,6 +122,35 @@ TGraphErrors *DataContainerHelper::ToTGraph(const DataContainer<StatCalculate, A
   return graph;
 }
 
+TGraphErrors *DataContainerHelper::ToTGraph(const DataContainer<StatDiscriminator, AxisD> &data, DrawErrors drawerror) {
+  if (data.GetAxes().size() > 1) {
+    std::cout << "Data container has more than one dimension. " << std::endl;
+    std::cout << "Cannot draw as Graph. Use Projection() to make it one dimensional." << std::endl;
+    return nullptr;
+  }
+  auto graph = new TGraphErrors();
+  unsigned int ibin = 0;
+  for (const auto &bin : data) {
+    if (bin.SumWeights() <= 0.) {
+      ibin++;
+      continue;
+    }
+    auto y = bin.Mean();
+    auto ey = bin.StandardErrorOfMean();
+    auto xhi = data.GetAxes().front().GetUpperBinEdge(ibin);
+    auto xlo = data.GetAxes().front().GetLowerBinEdge(ibin);
+    auto xhalfwidth = (xhi - xlo)/2.;
+    auto x = xlo + xhalfwidth;
+    double ex = 0;
+    if (drawerror == Errors::XandY) { ex = xhalfwidth; }
+    graph->SetPoint(graph->GetN(), x, y);
+    graph->SetPointError(graph->GetN() - 1, ex, ey);
+    graph->SetMarkerStyle(kFullCircle);
+    ibin++;
+  }
+  return graph;
+}
+
 void DataContainerHelper::Browse(DataContainerStatistic *data, TBrowser *b) {
   using DrawErrorGraph = Internal::ProjectionDrawable<TGraphErrors *>;
   if (!data->list_) data->list_ = new TList();
@@ -175,6 +204,29 @@ void DataContainerHelper::Browse(DataContainerStatistic *data, TBrowser *b) {
 }
 
 void DataContainerHelper::Browse(DataContainerStatCalculate *data, TBrowser *b) {
+  using DrawErrorGraph = Internal::ProjectionDrawable<TGraphErrors *>;
+  if (!data->list_) data->list_ = new TList();
+  data->list_->SetOwner(true);
+  for (auto &axis : data->axes_) {
+    TGraphErrors *graph;
+    if (data->dimension_ > 1) {
+      graph = DataContainerHelper::ToTGraph(data->Projection({axis.Name()}),
+                                            Errors::Yonly);
+    } else {
+      graph = DataContainerHelper::ToTGraph(*data, Errors::Yonly);
+    }
+    graph->SetName(axis.Name().data());
+    graph->SetTitle(axis.Name().data());
+    graph->GetXaxis()->SetTitle(axis.Name().data());
+    auto *drawable = new DrawErrorGraph(graph);
+    data->list_->Add(drawable);
+  }
+  for (int i = 0; i < data->list_->GetSize(); ++i) {
+    b->Add(data->list_->At(i));
+  }
+}
+
+void DataContainerHelper::Browse(DataContainerStatDiscriminator *data, TBrowser *b) {
   using DrawErrorGraph = Internal::ProjectionDrawable<TGraphErrors *>;
   if (!data->list_) data->list_ = new TList();
   data->list_->SetOwner(true);

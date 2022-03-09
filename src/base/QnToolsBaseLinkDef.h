@@ -33,9 +33,11 @@
 #pragma link C++ class Qn::Stat + ;
 #pragma link C++ class Qn::StatCollect + ;
 #pragma link C++ class Qn::StatCalculate + ;
+#pragma link C++ class Qn::StatDiscriminator + ;
 #pragma link C++ class Qn::DataContainer < Qn::Statistics, Qn::Axis < double>> + ;
 #pragma link C++ class Qn::DataContainer < Qn::StatCollect, Qn::Axis < double>> + ;
 #pragma link C++ class Qn::DataContainer < Qn::StatCalculate, Qn::Axis < double>> + ;
+#pragma link C++ class Qn::DataContainer < Qn::StatDiscriminator, Qn::Axis < double>> + ;
 #pragma link C++ class Qn::DataContainer < Qn::QVector, Qn::Axis < double>> + ;
 #pragma link C++ class Qn::DataContainer < double, Qn::Axis < double>> + ;
 #pragma link C++ class Qn::DataContainer < TH1F, Qn::Axis < double>> + ;
@@ -47,6 +49,7 @@
 #pragma link C++ typedef Qn::DataContainerStatistics;
 #pragma link C++ typedef Qn::DataContainerStatCollect;
 #pragma link C++ typedef Qn::DataContainerStatCalculate;
+#pragma link C++ typedef Qn::DataContainerStatDiscriminator;
 #pragma link C++ typedef Qn::DataContainerQVector;
 
 #pragma link C++ function Qn::ToTGraph;

@@ -30,6 +30,7 @@
 #include "Rtypes.h"
 #include "StatCalculate.hpp"
 #include "StatCollect.hpp"
+#include "StatDiscriminator.hpp"
 #include "TBrowser.h"
 #include "TClass.h"
 #include "TCollection.h"
@@ -937,6 +938,7 @@ template<typename T>
 using DataD = DataContainer<T, AxisD>;
 using DataContainerStatCalculate = DataContainer<Qn::StatCalculate, AxisD>;
 using DataContainerStatCollect = DataContainer<Qn::StatCollect, AxisD>;
+using DataContainerStatDiscriminator = DataContainer<Qn::StatDiscriminator, AxisD>;
 using DataContainerStatistic = DataContainer<Qn::Statistics, AxisD>;
 using BinnedStatistics = DataContainer<Qn::StatCalculate, AxisD>;
 using DataContainerQVector = DataContainer<Qn::QVector, AxisD>;
@@ -965,6 +967,11 @@ inline void DataContainer<StatCalculate, AxisD>::Browse(TBrowser *b) {
   DataContainerHelper::Browse(this, b);
 }
 
+template<>  // why needed this template<> ?
+inline void DataContainer<StatDiscriminator, AxisD>::Browse(TBrowser *b) {
+  DataContainerHelper::Browse(this, b);
+}
+
 template<>
 inline void DataContainer<Statistics, AxisD>::NDraw(Option_t *option, const std::string &axis_name) {
   DataContainerHelper::ProjectandDraw(*this, option, axis_name);
@@ -975,6 +982,10 @@ inline void DataContainer<StatCollect, AxisD>::NDraw(Option_t *option, const std
 }
 template<>
 inline void DataContainer<StatCalculate, AxisD>::NDraw(Option_t *option, const std::string &axis_name) {
+  DataContainerHelper::ProjectandDraw(*this, option, axis_name);
+}
+template<>
+inline void DataContainer<StatDiscriminator, AxisD>::NDraw(Option_t *option, const std::string &axis_name) {
   DataContainerHelper::ProjectandDraw(*this, option, axis_name);
 }
 

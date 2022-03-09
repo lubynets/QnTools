@@ -28,6 +28,7 @@
 #include "Axis.hpp"
 #include "StatCalculate.hpp"
 #include "StatCollect.hpp"
+#include "StatDiscriminator.hpp"
 
 namespace Qn {
 //Forward declaration of DataContainer
@@ -72,15 +73,18 @@ class DataContainerHelper {
   static TGraphErrors *ToTGraph(const Qn::DataContainer<Statistics, AxisD> &data, Errors x = Errors::Yonly);
   static TGraphErrors *ToTGraph(const Qn::DataContainer<StatCollect, AxisD> &data, Errors x = Errors::Yonly);
   static TGraphErrors *ToTGraph(const Qn::DataContainer<StatCalculate, AxisD> &data, Errors x = Errors::Yonly);
+  static TGraphErrors *ToTGraph(const Qn::DataContainer<StatDiscriminator, AxisD> &data, Errors x = Errors::Yonly);
 
  private:
   friend Qn::DataContainer<StatCollect, AxisD>;
   friend Qn::DataContainer<Statistics, AxisD>;
   friend Qn::DataContainer<StatCalculate, AxisD>;
+  friend Qn::DataContainer<StatDiscriminator, AxisD>;
 
   static void Browse(Qn::DataContainer<Statistics, AxisD> *data, TBrowser *b);
   static void Browse(Qn::DataContainer<StatCollect, AxisD> *data, TBrowser *b);
   static void Browse(Qn::DataContainer<StatCalculate, AxisD> *data, TBrowser *b);
+  static void Browse(Qn::DataContainer<StatDiscriminator, AxisD> *data, TBrowser *b);  
 
   template <typename DataContainer>
   static void ProjectandDraw(DataContainer &data, std::string option, const std::string &axis_name) {
@@ -119,6 +123,10 @@ inline TGraphErrors *ToTGraph(const Qn::DataContainer<StatCollect, AxisD> &data,
 }
 
 inline TGraphErrors *ToTGraph(DataContainer<StatCalculate, AxisD> &data, Qn::DrawErrors x = DrawErrors::Yonly) {
+  return DataContainerHelper::ToTGraph(data, x);
+}
+
+inline TGraphErrors *ToTGraph(DataContainer<StatDiscriminator, AxisD> &data, Qn::DrawErrors x = DrawErrors::Yonly) {
   return DataContainerHelper::ToTGraph(data, x);
 }
 
