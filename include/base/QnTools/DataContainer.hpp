@@ -31,6 +31,7 @@
 #include "StatCalculate.hpp"
 #include "StatCollect.hpp"
 #include "StatDiscriminator.hpp"
+#include "H1F.hpp"
 #include "TBrowser.h"
 #include "TClass.h"
 #include "TCollection.h"
