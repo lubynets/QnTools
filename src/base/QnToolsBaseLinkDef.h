@@ -34,14 +34,12 @@
 #pragma link C++ class Qn::StatCollect + ;
 #pragma link C++ class Qn::StatCalculate + ;
 #pragma link C++ class Qn::StatDiscriminator + ;
-#pragma link C++ class Qn::H1F + ;
 #pragma link C++ class Qn::ShapeContainer + ;
 #pragma link C++ class Qn::DataContainer < Qn::Statistics, Qn::Axis < double>> + ;
 #pragma link C++ class Qn::DataContainer < Qn::StatCollect, Qn::Axis < double>> + ;
 #pragma link C++ class Qn::DataContainer < Qn::StatCalculate, Qn::Axis < double>> + ;
 #pragma link C++ class Qn::DataContainer < Qn::StatDiscriminator, Qn::Axis < double>> + ;
 #pragma link C++ class Qn::DataContainer < Qn::ShapeContainer, Qn::Axis < double>> + ;
-#pragma link C++ class Qn::DataContainer < Qn::H1F, Qn::Axis < double>> + ;
 #pragma link C++ class Qn::DataContainer < Qn::QVector, Qn::Axis < double>> + ;
 #pragma link C++ class Qn::DataContainer < double, Qn::Axis < double>> + ;
 #pragma link C++ class Qn::DataContainer < TH1F, Qn::Axis < double>> + ;

@@ -24,6 +24,7 @@
 #include "TGraphAsymmErrors.h"
 #include "TGraphErrors.h"
 #include "TMultiGraph.h"
+#include "TH1F.h"
 
 #include "Axis.hpp"
 #include "StatCalculate.hpp"
@@ -129,6 +130,8 @@ inline TGraphErrors *ToTGraph(DataContainer<StatCalculate, AxisD> &data, Qn::Dra
 inline TGraphErrors *ToTGraph(DataContainer<StatDiscriminator, AxisD> &data, Qn::DrawErrors x = DrawErrors::Yonly) {
   return DataContainerHelper::ToTGraph(data, x);
 }
+
+TH1F Merge(const TH1F &lhs, const TH1F &rhs);
 
 }// namespace Qn
 

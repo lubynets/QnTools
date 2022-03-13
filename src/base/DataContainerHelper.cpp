@@ -271,4 +271,11 @@ void DataContainerHelper::Browse(DataContainerStatCollect *data, TBrowser *b) {
   }
 }
 
+TH1F Merge(const TH1F &lhs, const TH1F &rhs) {
+  TH1F merged = *(TH1F*)lhs.Clone();
+  merged.Add(&rhs);
+
+  return merged;
+}
+
 }// namespace Qn
