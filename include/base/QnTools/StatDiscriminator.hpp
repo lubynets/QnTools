@@ -30,6 +30,11 @@ class StatDiscriminator : public Stat {
   [[nodiscard]] double StandardErrorOfMean() const { return error_; }
   [[nodiscard]] double SumWeights() const { return weight_; }
   
+  void SetValue(double value) { value_ = value; }
+  void SetError(double value) { error_ = value; }
+  void SetWeight(double value) { weight_ = value; }
+  void SetVEW(double value, double error=0, double weight=1);
+  
   friend StatDiscriminator Merge(const StatDiscriminator &, const StatDiscriminator &);
   
   friend StatDiscriminator operator+(const StatDiscriminator &, const StatDiscriminator &);

@@ -24,6 +24,12 @@ StatDiscriminator::StatDiscriminator(StatCollect &scol, ErrorType type) {
   error_ = scalc.StandardErrorOfMean();
 }
 
+void StatDiscriminator::SetVEW(double value, double error, double weight) {
+  value_ = value;
+  error_ = error;
+  weight_ = weight;
+}
+
 StatDiscriminator Merge(const StatDiscriminator &lhs, const StatDiscriminator &rhs) {
   StatDiscriminator merged;
   

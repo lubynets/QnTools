@@ -31,6 +31,7 @@
 #include "StatCalculate.hpp"
 #include "StatCollect.hpp"
 #include "StatDiscriminator.hpp"
+#include "ShapeContainer.hpp"
 #include "H1F.hpp"
 #include "TBrowser.h"
 #include "TClass.h"
@@ -940,6 +941,7 @@ using DataD = DataContainer<T, AxisD>;
 using DataContainerStatCalculate = DataContainer<Qn::StatCalculate, AxisD>;
 using DataContainerStatCollect = DataContainer<Qn::StatCollect, AxisD>;
 using DataContainerStatDiscriminator = DataContainer<Qn::StatDiscriminator, AxisD>;
+using DataContainerShapeContainer = DataContainer<Qn::ShapeContainer, AxisD>;
 using DataContainerStatistic = DataContainer<Qn::Statistics, AxisD>;
 using BinnedStatistics = DataContainer<Qn::StatCalculate, AxisD>;
 using DataContainerQVector = DataContainer<Qn::QVector, AxisD>;

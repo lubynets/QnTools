@@ -1,5 +1,6 @@
 # Ignore build directory
-build
+build*
+install*
 .idea
 
 # macOS files
