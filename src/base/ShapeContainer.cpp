@@ -57,7 +57,7 @@ float ShapeContainer::GetSignalIntegral(float left, float right)
   if(is_histo_sgnl_ == true)
     return ShapeContainer::HistoIntegral(histo_sgnl_, left, right);
   else
-    return func_sgnl_ -> Integral(left, right);
+    return func_sgnl_ -> Integral(left, right) / bin_width_;
 }
 
 float ShapeContainer::GetBackgroundIntegral(float left, float right)
@@ -65,7 +65,7 @@ float ShapeContainer::GetBackgroundIntegral(float left, float right)
   if(is_histo_bckgr_ == true)
     return ShapeContainer::HistoIntegral(histo_bckgr_, left, right);
   else
-    return func_bckgr_ -> Integral(left, right);
+    return func_bckgr_ -> Integral(left, right) / bin_width_;
 }
 
 float ShapeContainer::HistoIntegral(TH1F* histo, float low, float up)
@@ -88,5 +88,15 @@ float ShapeContainer::HistoIntegral(TH1F* histo, float low, float up)
   
   return integral;
 }
+
+// float ShapeContainer::FuncIntegral(TF1* func, float low, float up) {
+//   const int nbins = 1000;
+//   const float binwidth = (up-low)/nbins;
+//   TH1F* histo = new TH1F("h1", "", nbins, low, up);
+//   for(int i=1; i<=nbins; i++)
+//     histo->SetBinContent(i, func->Eval(low+(i-0.5)*binwidth));
+//   
+//   return HistoIntegral(histo, low, up)*binwidth;
+// }
 
 }
