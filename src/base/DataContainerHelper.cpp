@@ -278,4 +278,11 @@ TH1F Merge(const TH1F &lhs, const TH1F &rhs) {
   return merged;
 }
 
+TH2F Merge(const TH2F &lhs, const TH2F &rhs) {
+  TH2F merged = *(TH2F*)lhs.Clone();
+  merged.Add(&rhs);
+
+  return merged;
+}
+
 }// namespace Qn

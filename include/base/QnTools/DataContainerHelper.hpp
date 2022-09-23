@@ -25,6 +25,7 @@
 #include "TGraphErrors.h"
 #include "TMultiGraph.h"
 #include "TH1F.h"
+#include "TH2F.h"
 
 #include "Axis.hpp"
 #include "StatCalculate.hpp"
@@ -132,6 +133,7 @@ inline TGraphErrors *ToTGraph(DataContainer<StatDiscriminator, AxisD> &data, Qn:
 }
 
 TH1F Merge(const TH1F &lhs, const TH1F &rhs);
+TH2F Merge(const TH2F &lhs, const TH2F &rhs);
 
 }// namespace Qn
 
