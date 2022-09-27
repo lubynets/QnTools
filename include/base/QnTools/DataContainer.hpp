@@ -39,6 +39,7 @@
 #include "TF1.h"
 #include "TGraphErrors.h"
 #include "TH1F.h"
+#include "TH2F.h"
 #include "TMath.h"
 #include "TObject.h"
 

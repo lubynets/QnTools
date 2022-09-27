@@ -43,6 +43,7 @@
 #pragma link C++ class Qn::DataContainer < Qn::QVector, Qn::Axis < double>> + ;
 #pragma link C++ class Qn::DataContainer < double, Qn::Axis < double>> + ;
 #pragma link C++ class Qn::DataContainer < TH1F, Qn::Axis < double>> + ;
+#pragma link C++ class Qn::DataContainer < TH2F, Qn::Axis < double>> + ;
 #pragma link C++ class Qn::DataContainerHelper + ;
 
 #pragma link C++ typedef Qn::AxisF;
