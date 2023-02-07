@@ -4,6 +4,11 @@
 
 namespace Qn {
 
+void ShapeContainer::SetInputHisto(TH1F* histo) {
+  histo_in_ = histo;
+  this -> SetBinWidth(histo_in_->GetBinWidth(1));
+}
+
 void ShapeContainer::SetShape(TH1F* histosgnl, TH1F* histobckgr)
 {
   histo_sgnl_ = histosgnl;
