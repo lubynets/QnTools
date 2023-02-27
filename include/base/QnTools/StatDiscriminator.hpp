@@ -19,7 +19,7 @@ class StatDiscriminator : public Stat {
   StatDiscriminator() = default;
   
   /// Construct StatDiscriminator from StatCalculate.
-  explicit StatDiscriminator(StatCalculate &sc);
+  explicit StatDiscriminator(StatCalculate &sc, ErrorType type = ErrorType::BOOTSTRAP);
   
   /// Construct StatDiscriminator from StatCollect.
   explicit StatDiscriminator(StatCollect &sc, ErrorType type = ErrorType::BOOTSTRAP);

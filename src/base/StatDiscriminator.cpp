@@ -9,10 +9,13 @@ namespace Qn {
   
 StatDiscriminator::~StatDiscriminator() = default;
 
-StatDiscriminator::StatDiscriminator(StatCalculate &scalc) {
+StatDiscriminator::StatDiscriminator(StatCalculate &scalc, ErrorType type) {
+  ErrorType type_buffer = scalc.GetErrorType();
+  scalc.SetErrorType(type);
   weight_ = scalc.SumWeights();
   value_ = scalc.Mean();
   error_ = scalc.StandardErrorOfMean();
+  scalc.SetErrorType(type_buffer);
 }
 
 StatDiscriminator::StatDiscriminator(StatCollect &scol, ErrorType type) {
