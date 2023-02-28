@@ -26,15 +26,43 @@ class StatDiscriminator : public Stat {
   
   virtual ~StatDiscriminator();
   
-  [[nodiscard]] double Mean() const { return value_; } 
-  [[nodiscard]] double StandardErrorOfMean() const { return error_; }
-  [[nodiscard]] double SumWeights() const { return weight_; }
-  
+  double Mean() const;
+
+  double MeanFromPropagation() const { return value_; }
+
+  double MeanFromBootstrap() const;
+
+  double StandardErrorOfMean() const;
+
+  double SumWeights() const { return weight_; }
+
+  double StdDevOfMeanFromPropagation() const { return error_; }
+
+  /// Returns the standard error of the mean from bootstrapping using the variance statistic.
+  double StdDevOfMeanFromBootstrapVariance() const { return std::sqrt(VarianceOfMeanFromBootstrap()); }
+
+  /// Returns variance of the sample mean from bootstrapping using the variance statistic.
+  double VarianceOfMeanFromBootstrap() const;
+
+  /// Retunrs the vector of means of bootstrap samples
+  const std::vector<double>& GetSampleMeans() const { return sample_means_; }
+
+  /// Retunrs the vector of weights of bootstrap samples
+  const std::vector<double>& GetSampleWeights() const { return sample_weights_; }
+
+  /// Sets the error type.
+  void SetMeanType(ErrorType type) { type_of_mean_ = type; }
+
+  /// Returns the error type.
+  ErrorType GetMeanType() const { return type_of_mean_; }
+
   void SetValue(double value) { value_ = value; }
   void SetError(double value) { error_ = value; }
   void SetWeight(double value) { weight_ = value; }
   void SetVEW(double value, double error=0, double weight=1);
-  
+  void AddSampleMean(double value) { sample_means_.push_back(value); }
+  void AddSampleWeight(double value) { sample_weights_.push_back(value); }
+
   friend StatDiscriminator Merge(const StatDiscriminator &, const StatDiscriminator &);
   
   friend StatDiscriminator operator+(const StatDiscriminator &, const StatDiscriminator &);
@@ -51,6 +79,11 @@ class StatDiscriminator : public Stat {
   double value_{0};
   double error_{0};
   double weight_{0};
+
+  std::vector<double> sample_means_; /// means of bootstrap samples
+  std::vector<double> sample_weights_; /// weights of bootstrap samples
+
+  ErrorType type_of_mean_ = ErrorType::PROPAGATION;
   
   /// \cond CLASSIMP
  ClassDef(StatDiscriminator, 1);

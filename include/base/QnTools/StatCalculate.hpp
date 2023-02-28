@@ -130,6 +130,12 @@ class StatCalculate : public Stat {
     else                                          return StdDevOfMeanFromBootstrapVariance();
   }
 
+  /// Retunrs the vector of means of bootstrap samples
+  const std::vector<double>& GetSampleMeans() const { return sample_means_; }
+
+  /// Retunrs the vector of weights of bootstrap samples
+  const std::vector<double>& GetSampleWeights() const { return sample_weights_; }
+
   /// Merge using pooled statistics
   /// For merging of pooled variance see:
   /// https://en.wikipedia.org/w/index.php?title=Pooled_variance&oldid=953883248#Sample-based_statistics

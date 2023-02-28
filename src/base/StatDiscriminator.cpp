@@ -33,6 +33,40 @@ void StatDiscriminator::SetVEW(double value, double error, double weight) {
   weight_ = weight;
 }
 
+double StatDiscriminator::StandardErrorOfMean() const {
+  if (GetErrorType() == ErrorType::PROPAGATION) return StdDevOfMeanFromPropagation();
+  else                                          return StdDevOfMeanFromBootstrapVariance();
+}
+
+double StatDiscriminator::Mean() const {
+  if (GetMeanType() == ErrorType::PROPAGATION) return MeanFromPropagation();
+  else                                         return MeanFromBootstrap();
+}
+
+double StatDiscriminator::VarianceOfMeanFromBootstrap() const {
+  Statistics stats;
+  for (std::size_t i = 0; i < sample_means_.size(); ++i) {
+    if (std::isnan(sample_means_[i]) && sample_weights_[i] > 0) {
+      std::cerr << "Skipping NAN-value with non-zero weight for " << i << "-th sample"  << std::endl;
+      continue;
+    }
+    stats.Fill(sample_means_[i], sample_weights_[i]);
+  }
+  return stats.Variance();
+}
+
+double StatDiscriminator::MeanFromBootstrap() const {
+  Statistics stats;
+  for (std::size_t i = 0; i < sample_means_.size(); ++i) {
+    if (std::isnan(sample_means_[i]) && sample_weights_[i] > 0) {
+      std::cerr << "Skipping NAN-value with non-zero weight for " << i << "-th sample"  << std::endl;
+      continue;
+    }
+    stats.Fill(sample_means_[i], sample_weights_[i]);
+  }
+  return stats.Mean();
+}
+
 StatDiscriminator Merge(const StatDiscriminator &lhs, const StatDiscriminator &rhs) {
   StatDiscriminator merged;
   
@@ -41,6 +75,28 @@ StatDiscriminator Merge(const StatDiscriminator &lhs, const StatDiscriminator &r
   merged.error_ = std::sqrt(lhs.StandardErrorOfMean()*lhs.StandardErrorOfMean()*lhs.SumWeights()*lhs.SumWeights() +
                             rhs.StandardErrorOfMean()*rhs.StandardErrorOfMean()*rhs.SumWeights()*rhs.SumWeights()) /
                   merged.SumWeights();
+
+  // Bootstrap samples
+  if (lhs.weight_ == 0.) {
+    merged.sample_means_ = rhs.sample_means_;
+    merged.sample_weights_ = rhs.sample_weights_;
+  } else if (rhs.weight_ == 0.) {
+    merged.sample_means_ = lhs.sample_means_;
+    merged.sample_weights_ = lhs.sample_weights_;
+  } else {
+    for (size_t i = 0; i < rhs.sample_means_.size(); ++i) {
+      auto lhs_mean = lhs.sample_means_[i];
+      auto lhs_weight = lhs.sample_weights_[i];
+      auto rhs_mean = rhs.sample_means_[i];
+      auto rhs_weight = rhs.sample_weights_[i];
+      auto merged_weight = lhs_weight + rhs_weight;
+      auto lhs_wm = lhs_weight > 0? lhs_mean * lhs_weight : 0.0;
+      auto rhs_wm = rhs_weight > 0? rhs_mean * rhs_weight : 0.0;
+      auto merged_mean = merged_weight > 0? (lhs_wm + rhs_wm) / merged_weight : 0.0;
+      merged.sample_weights_.push_back(merged_weight);
+      merged.sample_means_.push_back(merged_mean);
+    }
+  }
 
   return merged;
 }
@@ -53,6 +109,22 @@ StatDiscriminator operator+(const StatDiscriminator &lhs, const StatDiscriminato
   sum.error_ = std::sqrt(lhs.StandardErrorOfMean()*lhs.StandardErrorOfMean() +
                          rhs.StandardErrorOfMean()*rhs.StandardErrorOfMean());
 
+  // Bootstrap samples
+  for (size_t i = 0; i < lhs.sample_means_.size(); ++i) {
+    auto lhs_mean = lhs.sample_means_[i];
+    auto lhs_weight = lhs.sample_weights_[i];
+    auto rhs_mean = rhs.sample_means_[i];
+    auto rhs_weight = rhs.sample_weights_[i];
+    /* if any of arguments is not determined, sum is also not determined */
+    if (lhs_weight <= 0 || rhs_weight <= 0) {
+      sum.sample_weights_[i] = 0.0;
+      sum.sample_means_[i] = 0.0;
+    } else {
+      sum.sample_weights_[i] = lhs.sample_weights_[i];
+      sum.sample_means_[i] = lhs_mean + rhs_mean;
+    }
+  }
+
   return sum;
 }
 
@@ -64,6 +136,22 @@ StatDiscriminator operator-(const StatDiscriminator &lhs, const StatDiscriminato
   difference.error_ = std::sqrt(lhs.StandardErrorOfMean()*lhs.StandardErrorOfMean() +
                                 rhs.StandardErrorOfMean()*rhs.StandardErrorOfMean());
 
+  // Bootstrap samples
+  for (size_t i = 0; i < lhs.sample_means_.size(); ++i) {
+    auto lhs_mean = lhs.sample_means_[i];
+    auto lhs_weight = lhs.sample_weights_[i];
+    auto rhs_mean = rhs.sample_means_[i];
+    auto rhs_weight = rhs.sample_weights_[i];
+    /* if any of arguments is not determined, difference is also not determined */
+    if (lhs_weight <= 0 || rhs_weight <= 0) {
+      difference.sample_weights_[i] = 0;
+      difference.sample_means_[i] = 0;
+    } else {
+      difference.sample_weights_[i] = lhs_weight;
+      difference.sample_means_[i] = lhs_mean - rhs_mean;
+    }
+  }
+
   return difference;
 }
 
@@ -74,6 +162,21 @@ StatDiscriminator operator*(const StatDiscriminator &lhs, const StatDiscriminato
   product.value_ = lhs.Mean() * rhs.Mean();
   product.error_ = std::sqrt(lhs.StandardErrorOfMean()*lhs.StandardErrorOfMean()*rhs.Mean()*rhs.Mean() +
                              rhs.StandardErrorOfMean()*rhs.StandardErrorOfMean()*lhs.Mean()*lhs.Mean());
+
+  // Bootstrap samples
+  for (size_t i = 0; i < lhs.sample_means_.size(); ++i) {
+    auto lhs_mean = lhs.sample_means_[i];
+    auto lhs_weight = lhs.sample_weights_[i];
+    auto rhs_mean = rhs.sample_means_[i];
+    auto rhs_weight = rhs.sample_weights_[i];
+    if (lhs_weight <= 0 || rhs_weight <= 0) {
+      product.sample_weights_[i] = 0.;
+      product.sample_means_[i] = 0;
+    } else {
+      product.sample_weights_[i] = lhs_weight;
+      product.sample_means_[i] = lhs_mean * rhs_mean;
+    }
+  }
 
   return product;
 }
@@ -87,6 +190,21 @@ StatDiscriminator operator/(const StatDiscriminator &num, const StatDiscriminato
                            den.Mean()*den.Mean()*num.StandardErrorOfMean()*num.StandardErrorOfMean()) /
                  den.Mean() / den.Mean();
 
+  // Bootstrap samples
+  for (size_t i = 0; i < num.sample_means_.size(); ++i) {
+    auto lhs_mean = num.sample_means_[i];
+    auto lhs_weight = num.sample_weights_[i];
+    auto rhs_mean = den.sample_means_[i];
+    auto rhs_weight = den.sample_weights_[i];
+    if (lhs_weight <= 0 || rhs_weight <= 0) {
+      ratio.sample_weights_[i] = 0.0;
+      ratio.sample_means_[i] = 0;
+    } else {
+      ratio.sample_weights_[i] = lhs_weight;
+      ratio.sample_means_[i] = lhs_mean / rhs_mean;
+    }
+  }
+
   return ratio;
 }
 
@@ -96,6 +214,12 @@ StatDiscriminator operator*(const StatDiscriminator &operand, double scale) {
   scaled.weight_ = operand.SumWeights();
   scaled.value_ = operand.Mean() * scale;
   scaled.error_ = operand.StandardErrorOfMean() * scale;
+
+  // Bootstrap samples
+  for (size_t i = 0; i < operand.sample_means_.size(); ++i) {
+    scaled.sample_weights_[i] = operand.sample_weights_[i];
+    scaled.sample_means_[i] = operand.sample_means_[i] * scale;
+  }
 
   return scaled;
 }
@@ -114,6 +238,12 @@ StatDiscriminator Pow(const StatDiscriminator &base, double exp) {
   result.weight_ = base.SumWeights();
   result.value_ = std::pow(base.Mean(), exp);
   result.error_ = exp * result.Mean() * base.StandardErrorOfMean() / base.Mean();
+
+  // Bootstrap samples
+  for (size_t i = 0; i < base.sample_means_.size(); ++i) {
+    result.sample_weights_[i] = base.sample_weights_[i];
+    result.sample_means_[i] = std::pow(base.sample_means_[i],exp);
+  }
 
   return result;  
 }
