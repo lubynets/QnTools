@@ -103,7 +103,9 @@ StatDiscriminator Merge(const StatDiscriminator &lhs, const StatDiscriminator &r
 
 StatDiscriminator operator+(const StatDiscriminator &lhs, const StatDiscriminator &rhs) {
   StatDiscriminator sum;
-  
+  sum.sample_means_.resize(lhs.sample_means_.size());
+  sum.sample_weights_.resize(lhs.sample_weights_.size());
+
   sum.weight_ = lhs.SumWeights();
   sum.value_ = lhs.MeanFromPropagation() + rhs.MeanFromPropagation();
   sum.error_ = std::sqrt(lhs.StdDevOfMeanFromPropagation()*lhs.StdDevOfMeanFromPropagation() +
@@ -130,7 +132,9 @@ StatDiscriminator operator+(const StatDiscriminator &lhs, const StatDiscriminato
 
 StatDiscriminator operator-(const StatDiscriminator &lhs, const StatDiscriminator &rhs) {
   StatDiscriminator difference;
-  
+  difference.sample_means_.resize(lhs.sample_means_.size());
+  difference.sample_weights_.resize(lhs.sample_weights_.size());
+
   difference.weight_ = lhs.SumWeights();
   difference.value_ = lhs.MeanFromPropagation() - rhs.MeanFromPropagation();
   difference.error_ = std::sqrt(lhs.StdDevOfMeanFromPropagation()*lhs.StdDevOfMeanFromPropagation() +
@@ -157,6 +161,8 @@ StatDiscriminator operator-(const StatDiscriminator &lhs, const StatDiscriminato
 
 StatDiscriminator operator*(const StatDiscriminator &lhs, const StatDiscriminator &rhs) {
   StatDiscriminator product;
+  product.sample_means_.resize(lhs.sample_means_.size());
+  product.sample_weights_.resize(lhs.sample_weights_.size());
   
   product.weight_ = lhs.SumWeights();
   product.value_ = lhs.MeanFromPropagation() * rhs.MeanFromPropagation();
@@ -183,6 +189,8 @@ StatDiscriminator operator*(const StatDiscriminator &lhs, const StatDiscriminato
 
 StatDiscriminator operator/(const StatDiscriminator &num, const StatDiscriminator &den) {
   StatDiscriminator ratio;
+  ratio.sample_means_.resize(num.sample_means_.size());
+  ratio.sample_weights_.resize(num.sample_weights_.size());
   
   ratio.weight_ = num.SumWeights();
   ratio.value_ = num.MeanFromPropagation() / den.MeanFromPropagation();
@@ -210,11 +218,12 @@ StatDiscriminator operator/(const StatDiscriminator &num, const StatDiscriminato
 
 StatDiscriminator operator*(const StatDiscriminator &operand, double scale) {
   StatDiscriminator scaled;
+  scaled.sample_means_.resize(operand.sample_means_.size());
+  scaled.sample_weights_.resize(operand.sample_weights_.size());
   
   scaled.weight_ = operand.SumWeights();
   scaled.value_ = operand.MeanFromPropagation() * scale;
   scaled.error_ = operand.StdDevOfMeanFromPropagation() * scale;
-
   // Bootstrap samples
   for (size_t i = 0; i < operand.sample_means_.size(); ++i) {
     scaled.sample_weights_[i] = operand.sample_weights_[i];
@@ -234,6 +243,8 @@ StatDiscriminator operator/(const StatDiscriminator &operand, double scale) {
 
 StatDiscriminator Pow(const StatDiscriminator &base, double exp) {
   StatDiscriminator result;
+  result.sample_means_.resize(base.sample_means_.size());
+  result.sample_weights_.resize(base.sample_weights_.size());
   
   result.weight_ = base.SumWeights();
   result.value_ = std::pow(base.MeanFromPropagation(), exp);
