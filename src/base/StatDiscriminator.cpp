@@ -71,9 +71,9 @@ StatDiscriminator Merge(const StatDiscriminator &lhs, const StatDiscriminator &r
   StatDiscriminator merged;
   
   merged.weight_ = lhs.SumWeights() + rhs.SumWeights();
-  merged.value_ = (lhs.Mean()*lhs.SumWeights() + rhs.Mean()*rhs.SumWeights()) / merged.SumWeights();
-  merged.error_ = std::sqrt(lhs.StandardErrorOfMean()*lhs.StandardErrorOfMean()*lhs.SumWeights()*lhs.SumWeights() +
-                            rhs.StandardErrorOfMean()*rhs.StandardErrorOfMean()*rhs.SumWeights()*rhs.SumWeights()) /
+  merged.value_ = (lhs.MeanFromPropagation()*lhs.SumWeights() + rhs.MeanFromPropagation()*rhs.SumWeights()) / merged.SumWeights();
+  merged.error_ = std::sqrt(lhs.StdDevOfMeanFromPropagation()*lhs.StdDevOfMeanFromPropagation()*lhs.SumWeights()*lhs.SumWeights() +
+                            rhs.StdDevOfMeanFromPropagation()*rhs.StdDevOfMeanFromPropagation()*rhs.SumWeights()*rhs.SumWeights()) /
                   merged.SumWeights();
 
   // Bootstrap samples
@@ -105,9 +105,9 @@ StatDiscriminator operator+(const StatDiscriminator &lhs, const StatDiscriminato
   StatDiscriminator sum;
   
   sum.weight_ = lhs.SumWeights();
-  sum.value_ = lhs.Mean() + rhs.Mean();
-  sum.error_ = std::sqrt(lhs.StandardErrorOfMean()*lhs.StandardErrorOfMean() +
-                         rhs.StandardErrorOfMean()*rhs.StandardErrorOfMean());
+  sum.value_ = lhs.MeanFromPropagation() + rhs.MeanFromPropagation();
+  sum.error_ = std::sqrt(lhs.StdDevOfMeanFromPropagation()*lhs.StdDevOfMeanFromPropagation() +
+                         rhs.StdDevOfMeanFromPropagation()*rhs.StdDevOfMeanFromPropagation());
 
   // Bootstrap samples
   for (size_t i = 0; i < lhs.sample_means_.size(); ++i) {
@@ -132,9 +132,9 @@ StatDiscriminator operator-(const StatDiscriminator &lhs, const StatDiscriminato
   StatDiscriminator difference;
   
   difference.weight_ = lhs.SumWeights();
-  difference.value_ = lhs.Mean() - rhs.Mean();
-  difference.error_ = std::sqrt(lhs.StandardErrorOfMean()*lhs.StandardErrorOfMean() +
-                                rhs.StandardErrorOfMean()*rhs.StandardErrorOfMean());
+  difference.value_ = lhs.MeanFromPropagation() - rhs.MeanFromPropagation();
+  difference.error_ = std::sqrt(lhs.StdDevOfMeanFromPropagation()*lhs.StdDevOfMeanFromPropagation() +
+                                rhs.StdDevOfMeanFromPropagation()*rhs.StdDevOfMeanFromPropagation());
 
   // Bootstrap samples
   for (size_t i = 0; i < lhs.sample_means_.size(); ++i) {
@@ -159,9 +159,9 @@ StatDiscriminator operator*(const StatDiscriminator &lhs, const StatDiscriminato
   StatDiscriminator product;
   
   product.weight_ = lhs.SumWeights();
-  product.value_ = lhs.Mean() * rhs.Mean();
-  product.error_ = std::sqrt(lhs.StandardErrorOfMean()*lhs.StandardErrorOfMean()*rhs.Mean()*rhs.Mean() +
-                             rhs.StandardErrorOfMean()*rhs.StandardErrorOfMean()*lhs.Mean()*lhs.Mean());
+  product.value_ = lhs.MeanFromPropagation() * rhs.MeanFromPropagation();
+  product.error_ = std::sqrt(lhs.StdDevOfMeanFromPropagation()*lhs.StdDevOfMeanFromPropagation()*rhs.MeanFromPropagation()*rhs.MeanFromPropagation() +
+                             rhs.StdDevOfMeanFromPropagation()*rhs.StdDevOfMeanFromPropagation()*lhs.MeanFromPropagation()*lhs.MeanFromPropagation());
 
   // Bootstrap samples
   for (size_t i = 0; i < lhs.sample_means_.size(); ++i) {
@@ -185,10 +185,10 @@ StatDiscriminator operator/(const StatDiscriminator &num, const StatDiscriminato
   StatDiscriminator ratio;
   
   ratio.weight_ = num.SumWeights();
-  ratio.value_ = num.Mean() / den.Mean();
-  ratio.error_ = std::sqrt(num.Mean()*num.Mean()*den.StandardErrorOfMean()*den.StandardErrorOfMean() +
-                           den.Mean()*den.Mean()*num.StandardErrorOfMean()*num.StandardErrorOfMean()) /
-                 den.Mean() / den.Mean();
+  ratio.value_ = num.MeanFromPropagation() / den.MeanFromPropagation();
+  ratio.error_ = std::sqrt(num.MeanFromPropagation()*num.MeanFromPropagation()*den.StdDevOfMeanFromPropagation()*den.StdDevOfMeanFromPropagation() +
+                           den.MeanFromPropagation()*den.MeanFromPropagation()*num.StdDevOfMeanFromPropagation()*num.StdDevOfMeanFromPropagation()) /
+                 den.MeanFromPropagation() / den.MeanFromPropagation();
 
   // Bootstrap samples
   for (size_t i = 0; i < num.sample_means_.size(); ++i) {
@@ -212,8 +212,8 @@ StatDiscriminator operator*(const StatDiscriminator &operand, double scale) {
   StatDiscriminator scaled;
   
   scaled.weight_ = operand.SumWeights();
-  scaled.value_ = operand.Mean() * scale;
-  scaled.error_ = operand.StandardErrorOfMean() * scale;
+  scaled.value_ = operand.MeanFromPropagation() * scale;
+  scaled.error_ = operand.StdDevOfMeanFromPropagation() * scale;
 
   // Bootstrap samples
   for (size_t i = 0; i < operand.sample_means_.size(); ++i) {
@@ -236,8 +236,8 @@ StatDiscriminator Pow(const StatDiscriminator &base, double exp) {
   StatDiscriminator result;
   
   result.weight_ = base.SumWeights();
-  result.value_ = std::pow(base.Mean(), exp);
-  result.error_ = exp * result.Mean() * base.StandardErrorOfMean() / base.Mean();
+  result.value_ = std::pow(base.MeanFromPropagation(), exp);
+  result.error_ = exp * result.MeanFromPropagation() * base.StdDevOfMeanFromPropagation() / base.MeanFromPropagation();
 
   // Bootstrap samples
   for (size_t i = 0; i < base.sample_means_.size(); ++i) {
