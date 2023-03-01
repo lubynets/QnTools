@@ -9,22 +9,21 @@ namespace Qn {
   
 StatDiscriminator::~StatDiscriminator() = default;
 
-StatDiscriminator::StatDiscriminator(StatCalculate &scalc, ErrorType type) {
-  ErrorType type_buffer = scalc.GetErrorType();
-  scalc.SetErrorType(type);
+StatDiscriminator::StatDiscriminator(StatCalculate &scalc) {
   weight_ = scalc.SumWeights();
   value_ = scalc.Mean();
-  error_ = scalc.StandardErrorOfMean();
-  scalc.SetErrorType(type_buffer);
+  error_ = scalc.StdDevOfMeanFromPropagation();
+  sample_means_ = scalc.GetSampleMeans();
+  sample_weights_ = scalc.GetSampleWeights();
 }
 
-StatDiscriminator::StatDiscriminator(StatCollect &scol, ErrorType type) {
+StatDiscriminator::StatDiscriminator(StatCollect &scol) {
   StatCalculate scalc(scol);
-  scalc.SetErrorType(type);
-  
-  weight_ = scalc.SumWeights();           // how to call upper constructor in the current one?
+  weight_ = scalc.SumWeights();
   value_ = scalc.Mean();
-  error_ = scalc.StandardErrorOfMean();
+  error_ = scalc.StdDevOfMeanFromPropagation();
+  sample_means_ = scalc.GetSampleMeans();
+  sample_weights_ = scalc.GetSampleWeights();
 }
 
 void StatDiscriminator::SetVEW(double value, double error, double weight) {
