@@ -956,6 +956,11 @@ inline void DataContainer<StatCalculate, AxisD>::SetErrors(StatCalculate::ErrorT
 }
 
 template<>
+inline void DataContainer<StatDiscriminator, AxisD>::SetErrors(StatDiscriminator::ErrorType type) {
+  for (auto &bin : data_) bin.SetErrorType(type);
+}
+
+template<>
 inline void DataContainer<StatCollect, AxisD>::Browse(TBrowser *b) {
   DataContainerHelper::Browse(this, b);
 }
