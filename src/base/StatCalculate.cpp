@@ -263,7 +263,13 @@ StatCalculate Pow(const StatCalculate &base, double exp) {
  * @return sqrt(StatCalculate)
  */
 StatCalculate Sqrt(const StatCalculate &operand) {
-  return Pow(operand,(1./2));
+  double sign;
+  if(operand.mean_ > 0.) {
+    sign = 1.;
+  } else {
+    sign = -1.;
+  }
+  return sign*Pow(operand*sign,(1./2));
 }
 
 
