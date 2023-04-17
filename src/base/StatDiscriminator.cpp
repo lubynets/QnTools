@@ -13,6 +13,7 @@ StatDiscriminator::StatDiscriminator(StatCalculate &scalc) {
   weight_ = scalc.SumWeights();
   value_ = scalc.Mean();
   error_ = scalc.StdDevOfMeanFromPropagation();
+  n_effective_ = 1./scalc.NEffectiveInverse();
   sample_means_ = scalc.GetSampleMeans();
   sample_weights_ = scalc.GetSampleWeights();
 }
@@ -22,6 +23,7 @@ StatDiscriminator::StatDiscriminator(StatCollect &scol) {
   weight_ = scalc.SumWeights();
   value_ = scalc.Mean();
   error_ = scalc.StdDevOfMeanFromPropagation();
+  n_effective_ = scol.GetStatistics().Neff();
   sample_means_ = scalc.GetSampleMeans();
   sample_weights_ = scalc.GetSampleWeights();
 }

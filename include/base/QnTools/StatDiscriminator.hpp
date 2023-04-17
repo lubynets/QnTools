@@ -44,6 +44,8 @@ class StatDiscriminator : public Stat {
   /// Returns variance of the sample mean from bootstrapping using the variance statistic.
   double VarianceOfMeanFromBootstrap() const;
 
+  double Neff() const { return n_effective_; }
+
   /// Retunrs the vector of means of bootstrap samples
   const std::vector<double>& GetSampleMeans() const { return sample_means_; }
 
@@ -82,6 +84,8 @@ class StatDiscriminator : public Stat {
 
   std::vector<double> sample_means_; /// means of bootstrap samples
   std::vector<double> sample_weights_; /// weights of bootstrap samples
+
+  double n_effective_{0};
 
   ErrorType type_of_mean_ = ErrorType::PROPAGATION;
   
